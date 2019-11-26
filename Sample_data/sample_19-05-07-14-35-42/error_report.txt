@@ -1,0 +1,2 @@
+Gene Symbol	Ensembl transcript ID	sgRNA	sgRNA Strand	Error
+ADGRD2	ENST00000334810	N/A	N/A	Sequences contain non-ACTG characters

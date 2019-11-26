@@ -1,0 +1,1 @@
+Gene Symbol	Ensembl transcript ID	sgRNA	sgRNA Strand	Error
