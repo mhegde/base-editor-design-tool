@@ -37,7 +37,7 @@ if __name__ == '__main__':
             filter_gc = b['Filter GC']
             cmd = 'python base_editing_guide_designs.py --input-file '+args.input_file+' --input-type '+ args.ip_type +\
                   ' --pam '+pam+' --edit-window '+window+' --sg-len '+str(sglen)+' --edit '+edit+' --intron-buffer '\
-                  +str(intron_buffer)+'--filter-gc '+filter_gc+ '--output-name '+output_prefix
+                  +str(intron_buffer)+' --filter-gc '+filter_gc+ '--output-name '+output_prefix
         os.system(cmd)
 
 
