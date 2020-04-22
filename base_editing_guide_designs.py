@@ -646,7 +646,7 @@ def filter_gc_motifs_for_aa(sgrna_strand,sgrna_context,codon_start,k):
 			return False
 	elif sgrna_strand == 'antisense':
 		if sgrna_context[len(sgrna_context) - (codon_start+k)-2] == 'G':
-			motif_check = False
+			return False
 	return True
 
 
