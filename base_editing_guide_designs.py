@@ -217,6 +217,10 @@ def get_utrs(tr_info, exons, gene_strand):
 				elif (e['end']>int(ce_start)):
 					cds_start_exon = i+1
 					utr,j = get_utr_map(utr,e['start'],int(ce_start)-1,gene_strand,j)
+				elif (e['end']==int(ce_start)): # modification start
+					cds_start_exon = i+1
+					utr,j = get_utr_map(utr,e['start'],int(ce_start)-1,gene_strand,j)
+					print("WARNING: modified option used ce_start ({}) equals exon end ({}) in exon {}.".format(int(ce_start), e['end'], cds_start_exon))  # modification end
 			if (e['end'] > int(ce_last_end)):
 				if (e['start']>int(ce_last_end)):
 					utr,j = get_utr_map(utr,e['start'],e['end'],gene_strand,j)
@@ -788,6 +792,16 @@ def get_edit_info(context, sgrna, sgrna_strand, edit, window, pam, sgrna_trans, 
 
 	edit_map = {}
 	edit_map, window_silent, cds_error, num_stop, transcript_ref_allele, transcript_alt_allele, genome_ref_allele, genome_alt_allele = get_edits(edit_map,context,sgrna_window,edit,sgrna_trans,codon_map,j_window,sgrna_strand,pam,int(window_start),int(window_end), aa_map,filter_gc, sgrna_context)
+	if isinstance(edit_map, str): # modification start
+		print("WARNING: edit_map was type string with content '{}': transformed to empty dictionary.".format(edit_map))
+		edit_map = {}
+	needs_edit = False
+	for k,v in edit_map.iteritems():
+		if k.split("_")[1] == '':
+			needs_edit = True
+	if needs_edit:
+		edit_map = {key:edit_map[key] for key in edit_map if key.split("_")[1] != ''}
+		print("WARNING: entry ({}) in edit_map was misformed. This entry will be dropped.".format(k)) # modification end
 	snp_type_list, snp_info = get_snps(edit_map, edit, sg_gen_pos, gene_strand, sgrna_strand, gene_variant_df, aa_map)
 	clinical_sig = get_clinical_sig(snp_type_list)
 	return edit_map, window_silent, cds_error, num_stop, clinical_sig, snp_info, transcript_ref_allele, transcript_alt_allele, genome_ref_allele, genome_alt_allele
