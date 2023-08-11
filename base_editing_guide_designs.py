@@ -439,7 +439,7 @@ def parse_variant_df(variant_df):
 								& (variant_df.Type == 'single nucleotide variant')
 								& (variant_df.Chromosome != 'MT')
 								& (variant_df.Chromosome != 'na')
-								& (variant_df.ReferenceAllele != 'na')]
+								& (variant_df.ReferenceAlleleVCF != 'na')]
 	parsed_variant_df = temp_variant_df.copy()
 	parsed_variant_df.index = range(0,len(parsed_variant_df))
 	parsed_variant_df.rename(columns = {'Start':'ClinVar_SNP_Position'}, inplace=True)
@@ -451,8 +451,8 @@ def parse_variant_df(variant_df):
 										   'ClinicalSignificance',
 										   'PhenotypeList',
 										   'ClinVar_SNP_Position',
-										   'ReferenceAllele',
-										   'AlternateAllele',
+										   'ReferenceAlleleVCF',
+										   'AlternateAlleleVCF',
 										   'ReviewStatus']]
 	return parsed_variant_df
 
@@ -548,7 +548,7 @@ def get_snps(edit_map, edit, sg_gen_pos, gene_strand, sgrna_strand, gene_variant
 		codon_pos_list, edit_gen_pos_list = get_genomic_pos_list(edit_indices, gene_strand, sgrna_strand, sg_gen_pos)
 		# Check if there is any overlap between codon_pos_list and all_snps
 		if any(i in codon_pos_list for i in all_snps):
-			clinvar_snps_df = gene_variant_df[gene_variant_df.ClinVar_SNP_Position.isin(codon_pos_list)].loc[:,['Name','ClinicalSignificance','ClinVar_SNP_Position','ReferenceAllele','AlternateAllele','ReviewStatus']]
+			clinvar_snps_df = gene_variant_df[gene_variant_df.ClinVar_SNP_Position.isin(codon_pos_list)].loc[:,['Name','ClinicalSignificance','ClinVar_SNP_Position','ReferenceAlleleVCF','AlternateAlleleVCF','ReviewStatus']]
 			for index,row in clinvar_snps_df.iterrows():
 				snp_aa, snp_aa_from, snp_aa_num, snp_aa_to = parse_snp_name(row.Name, aa_map)
 				# First check for nucleotide position
@@ -559,13 +559,13 @@ def get_snps(edit_map, edit, sg_gen_pos, gene_strand, sgrna_strand, gene_variant
 					same_nucleotide_pos = True
 					# If sgRNA is in the forward strand, C>T or A>G SNPs will be created
 					if ((gene_strand == 1) and (sgrna_strand == 'sense') or ((gene_strand == -1) and sgrna_strand == 'antisense')):
-						if row.AlternateAllele == edit_to:
+						if row.AlternateAlleleVCF == edit_to:
 							same_nucleotide_change = True
 						else:
 							same_nucleotide_change = False
 					# If sgRNA is in the reverse strand, G>A or T>C SNPs will be created
 					elif ((gene_strand == 1) and (sgrna_strand == 'antisense') or ((gene_strand == -1) and sgrna_strand == 'sense')):
-						if row.AlternateAllele == revcom(edit_to):
+						if row.AlternateAlleleVCF == revcom(edit_to):
 							same_nucleotide_change = True
 						else:
 							same_nucleotide_change = False
@@ -1095,8 +1095,8 @@ def read_args(args):
 		edit = args.edit
 	variant_file = args.variant_file
 	variant_df = pd.read_table(variant_file, dtype = {'#AlleleID':str, 'Name':str, 'ClinicalSignificance':str, 'Assembly':str,
-													  'Chromosome':str,'Type':str,'Start':int,'ReferenceAllele':str,
-													  'AlternateAllele':str,'ReviewStatus':str}, usecols = ['#AlleleID',
+													  'Chromosome':str,'Type':str,'Start':int,'ReferenceAlleleVCF':str,
+													  'AlternateAlleleVCF':str,'ReviewStatus':str}, usecols = ['#AlleleID',
 																											'GeneSymbol',
 																											'Name',
 																											'ClinicalSignificance',
@@ -1105,8 +1105,8 @@ def read_args(args):
 																											'Chromosome',
 																											'Type',
 																											'Start',
-																											'ReferenceAllele',
-																											'AlternateAllele',
+																											'ReferenceAlleleVCF',
+																											'AlternateAlleleVCF',
 																											'ReviewStatus'])
 	parsed_variant_df = parse_variant_df(variant_df)
 	output_name = args.output_name
